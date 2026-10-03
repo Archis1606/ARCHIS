@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckCircle2, XCircle, AlertCircle, Database, AlertTriangle, TrendingUp } from 'lucide-react';
 import { getSafeValue } from '../../utils/formatters';
 
-export default function DataCompleteness({ parcel, completeness }) {
+function DataCompleteness({ parcel, completeness }) {
   const comp = completeness || parcel.completeness;
 
   if (!comp) {

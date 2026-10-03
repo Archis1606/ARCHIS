@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Layers, Maximize2, Minimize2, Target, Navigation, ZoomIn, ZoomOut, Fullscreen, RotateCcw } from '@lucide/react';
+import { MapPin, Layers, Maximize2, Minimize2, Target, Navigation, ZoomIn, ZoomOut, Fullscreen, RotateCcw } from 'lucide-react';
 import { getSafeValue } from '../../utils/formatters';
 
 export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }) {
@@ -89,13 +89,13 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
             className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
             aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
       {/* Map Container */}
-      <div ref={null} className="absolute inset-0">
+      <div ref={mapContainerRef} className="absolute inset-0">
         {/* Simulated Google Earth View */}
         <div className="absolute inset-0 relative">
           {/* Simulated satellite imagery background */}
@@ -125,7 +125,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
                 strokeDasharray="5,3"
               />
             </svg>
-          )
+          )}
 
           {/* Center marker */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -136,7 +136,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
           </div>
 
           {/* Boundary coordinates display */}
-          {boundaryCoordinates && boundaryCoordinates.length >= 3 && (
+          {boundaryCoordinates && boundaryCoordinates.length > 0 && (
             <div className="absolute bottom-4 left-4 right-4 max-w-md mx-auto bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">Parcel Boundary</span>
@@ -148,13 +148,13 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
                     <span>Vertex {i + 1}:</span>
                     <span className="font-mono text-white">{coord.lat.toFixed(6)}, {coord.lng.toFixed(6)}</span>
                   </div>
-                )}
+                ))}
                 {boundaryCoordinates.length > 4 && (
                   <span className="text-[10px] text-zinc-500">+ {boundaryCoordinates.length - 4} more vertices</span>
-                )
-              }
+                )}
+              </div>
             </div>
-          )
+          )}
 
           {/* Center coordinates display */}
           <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
@@ -164,94 +164,108 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
               <span className="font-mono text-white">{latitude.toFixed(6)}, {longitude.toFixed(6)}</span>
             </div>
           </div>
+        </div>
 
-          {/* Map Controls */}
-          <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
-            <button
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors"
-              aria-label="Zoom in"
-            >
-              <ZoomIn className="w-4 h-5" />
-            </button>
-            <button
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors"
-              aria-label="Zoom out"
-            >
-              <ZoomOut className="w-5 h-5" />
-            </button>
-            <button
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors"
-              aria-label="Reset view"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </button>
+        {/* Map Controls */}
+        <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
+          <button
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Zoom in"
+          >
+            <ZoomIn className="w-4 h-5" />
+          </button>
+          <button
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Zoom out"
+          >
+            <ZoomOut className="w-4 h-5" />
+          </button>
+          <button
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Reset view"
+          >
+            <RotateCcw className="w-4 h-5" />
+          </button>
+          <button
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Fullscreen"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Fullscreen className="w-4 h-4" />}
+          </button>
+        </div>
+
+        {/* Layer Controls */}
+        <div className="absolute bottom-4 left-4 z-10">
+          <div className="bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
+            <div className="flex items-center gap-2 mb-2">
+              <Layers className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">Layers</span>
+            </div>
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
+                <input type="checkbox" defaultChecked className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
+                <span>Parcel Boundary</span>
+              </label>
+              <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
+                <input type="checkbox" defaultChecked className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
+                <span>Satellite Imagery</span>
+              </label>
+              <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
+                <input type="checkbox" className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
+                <span>Cadastral Overlay</span>
+              </label>
+              <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
+                <input type="checkbox" className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
+                <span>Road Network</span>
+              </label>
+            </div>
           </div>
+        </div>
 
-          {/* Layer Controls */}
-          <div className="absolute bottom-4 left-4 z-10">
-            <div className="bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Layers className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">Layers</span>
-              </div>
-              <div className="space-y-1">
-                <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                  <input type="checkbox" defaultChecked className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
-                  <span>Parcel Boundary</span>
-                </label>
-                <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                  <input type="checkbox" defaultChecked className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
-                  <span>Satellite Imagery</span>
-                </label>
-                <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                  <input type="checkbox" className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
-                  <span>Cadastral Overlay</span>
-                </label>
-                <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
-                  <input type="checkbox" className="w-3 h-3 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500" />
-                  <span>Road Network</span>
-                </label>
+        {/* Parcel Info Card */}
+        <div className="absolute top-4 right-4 w-56 bg-black/80 backdrop-blur-xl rounded-xl p-4 border border-white/10">
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin className="w-4 h-4 text-emerald-400" />
+            <span className="text-sm font-medium text-emerald-400">Parcel Location</span>
+          </div>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between">
+              <span className="text-zinc-400">Latitude</span>
+              <span className="font-mono text-white">{latitude.toFixed(6)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-400">Longitude</span>
+              <span className="font-mono text-white">{longitude.toFixed(6)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-400">Boundary Points</span>
+              <span className="font-mono text-white">{boundaryCoordinates?.length || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Fullscreen overlay */}
+        {isFullscreen && (
+          <div className="absolute inset-0 z-50 fixed bg-black/95 backdrop-blur-sm">
+            <div className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors" onClick={() => setIsFullscreen(false)}>
+              <Minimize2 className="w-6 h-6" />
+            </div>
+            <div className="absolute top-4 left-4 p-2">
+              <button className="p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors" onClick={() => setIsFullscreen(false)}>
+                <Minimize2 className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="h-full w-full flex items-center justify-center">
+              <div className="w-full h-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden">
+                <GeospatialView parcel={parcel} measuredArea={measuredArea} setMeasuredArea={setMeasuredArea} />
               </div>
             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-            {/* Parcel Info Card */}
-            <div className="absolute top-4 right-4 w-56 bg-black/80 backdrop-blur-xl rounded-xl p-4 border border-white/10">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-400">Parcel Location</span>
-              </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">Latitude</span>
-                  <span className="font-mono text-white">{latitude.toFixed(6)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">Longitude</span>
-                  <span className="font-mono text-white">{longitude.toFixed(6)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">Boundary Points</span>
-                  <span className="font-mono text-white">{boundaryCoordinates?.length || 0}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Fullscreen overlay */}
-            {isFullscreen && (
-              <div className="absolute inset-0 z-50 fixed bg-black/95 backdrop-blur-sm">
-                <div className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors" onClick={() => setIsFullscreen(false)}>
-                  <Minimize2 className="w-6 h-6" />
-                </div>
-                <div className="absolute top-4 left-4 p-2">
-                  <button className="p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors" onClick={() => setIsFullscreen(false)}>
-                    <Minimize2 className="w-6 h-6" />
-                  </button>
-                </div>
-                <div className="h-full w-full flex items-center justify-center">
-                  <div className="w-full h-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden">
-                    <GeospatialView parcel={parcel} measuredArea={measuredArea} setMeasuredArea={setMeasuredArea} />
-                  </div>
-                </div>
-              </div>
-            );
-          }
+export default GeospatialView;
