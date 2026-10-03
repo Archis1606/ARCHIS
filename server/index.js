@@ -66,6 +66,110 @@ const mockData = {
     { state: 'Telangana', count: 360 }
   ],
 
+  // Mock Land Records with ULPIN (Unique Land Parcel Identification Number)
+  landRecords: [
+    {
+      ulpin: 'PB-LDH-2026-984124',
+      parcelId: 'PARC-PB-9841',
+      ownerName: 'Gurpreet Singh',
+      fatherName: 'Harbhajan Singh',
+      state: 'Punjab',
+      district: 'Ludhiana',
+      tehsil: 'Ludhiana West',
+      village: 'Gill',
+      khasraNo: '142//5/2',
+      khatauniNo: '88/112',
+      recordedArea: '4.82 Acres',
+      gisSpatialArea: '4.31 Acres',
+      landType: 'Agricultural (Irrigated)',
+      marketValueEstimate: '₹ 1,45,00,000',
+      lastMutationDate: '2024-03-15',
+      anomalyStatus: 'Area Discrepancy Detected (0.51 Acres)',
+      encumbranceStatus: 'Clear (No active mortgages)',
+      coordinates: '30.8654° N, 75.8569° E'
+    },
+    {
+      ulpin: 'HR-GGM-2026-441209',
+      parcelId: 'PARC-HR-4412',
+      ownerName: 'Rajesh Sharma',
+      fatherName: 'Ved Prakash Sharma',
+      state: 'Haryana',
+      district: 'Gurugram',
+      tehsil: 'Wazirabad',
+      village: 'Badshahpur',
+      khasraNo: '76//12/1',
+      khatauniNo: '104/145',
+      recordedArea: '1.25 Acres',
+      gisSpatialArea: '1.25 Acres',
+      landType: 'Commercial / Mixed Use',
+      marketValueEstimate: '₹ 8,90,00,000',
+      lastMutationDate: '2025-11-20',
+      anomalyStatus: 'Verified - No Anomalies',
+      encumbranceStatus: 'Bank Lien (SBI Industrial Finance)',
+      coordinates: '28.3980° N, 77.0543° E'
+    },
+    {
+      ulpin: 'UP-LKO-2026-118942',
+      parcelId: 'PARC-UP-1189',
+      ownerName: 'Amitabh Verma',
+      fatherName: 'Suresh Chandra Verma',
+      state: 'Uttar Pradesh',
+      district: 'Lucknow',
+      tehsil: 'Sarojini Nagar',
+      village: 'Amausi',
+      khasraNo: '318//4',
+      khatauniNo: '45/89',
+      recordedArea: '3.10 Acres',
+      gisSpatialArea: '3.10 Acres',
+      landType: 'Residential Plot',
+      marketValueEstimate: '₹ 2,75,00,000',
+      lastMutationDate: '2023-08-11',
+      anomalyStatus: 'Verified - Clean Record',
+      encumbranceStatus: 'Clear',
+      coordinates: '26.7606° N, 80.8893° E'
+    },
+    {
+      ulpin: 'RJ-JPR-2026-773410',
+      parcelId: 'PARC-RJ-7734',
+      ownerName: 'Vikram Singh Rathore',
+      fatherName: 'Bhairon Singh Rathore',
+      state: 'Rajasthan',
+      district: 'Jaipur',
+      tehsil: 'Sanganer',
+      village: 'Muhana',
+      khasraNo: '204//18/3',
+      khatauniNo: '210/332',
+      recordedArea: '6.40 Acres',
+      gisSpatialArea: '6.00 Acres',
+      landType: 'Agricultural (Dryland)',
+      marketValueEstimate: '₹ 3,20,00,000',
+      lastMutationDate: '2024-07-02',
+      anomalyStatus: 'Boundary Inconsistency with Road Margin',
+      encumbranceStatus: 'Clear',
+      coordinates: '26.7915° N, 75.7312° E'
+    },
+    {
+      ulpin: 'MH-MUM-2026-905183',
+      parcelId: 'PARC-MH-9051',
+      ownerName: 'Nitin Kulkarni',
+      fatherName: 'Anant Kulkarni',
+      state: 'Maharashtra',
+      district: 'Mumbai Suburban',
+      tehsil: 'Kurla',
+      village: 'Chembur',
+      khasraNo: 'CTS 1084/A',
+      khatauniNo: '512/04',
+      recordedArea: '0.45 Acres (19,602 Sq Ft)',
+      gisSpatialArea: '0.45 Acres',
+      landType: 'Urban Commercial',
+      marketValueEstimate: '₹ 24,50,00,000',
+      lastMutationDate: '2026-01-14',
+      anomalyStatus: 'Verified - Complete Cadastral Sync',
+      encumbranceStatus: 'Clear',
+      coordinates: '19.0622° N, 72.8994° E'
+    }
+  ],
+
   // Document types for selection
   documentTypes: [
     'Record of Rights / RoR',
@@ -235,6 +339,31 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Search Land Records by ULPIN or general query
+app.get('/api/land-records/search', (req, res) => {
+  const query = (req.query.q || '').trim().toLowerCase();
+  if (!query) {
+    return res.json({ success: true, data: mockData.landRecords });
+  }
+  const results = mockData.landRecords.filter(record =>
+    record.ulpin.toLowerCase().includes(query) ||
+    record.parcelId.toLowerCase().includes(query) ||
+    record.ownerName.toLowerCase().includes(query) ||
+    record.state.toLowerCase().includes(query) ||
+    record.district.toLowerCase().includes(query)
+  );
+  res.json({ success: true, data: results });
+});
+
+// Get Single Land Record by ULPIN
+app.get('/api/land-records/:ulpin', (req, res) => {
+  const record = mockData.landRecords.find(r => r.ulpin.toLowerCase() === req.params.ulpin.toLowerCase());
+  if (!record) {
+    return res.status(404).json({ success: false, message: 'Land record not found for the given ULPIN' });
+  }
+  res.json({ success: true, data: record });
+});
+
 // Admin route to add a new user
 app.post('/api/admin/add-user', async (req, res) => {
   try {
@@ -246,11 +375,10 @@ app.post('/api/admin/add-user', async (req, res) => {
     }
 
     // Generate loginId: first three letters of name (lowercase) + last four digits of mobile
-    const namePart = name.trim().toLowerCase().substring(0, 3).padEnd(3, 'x'); // Ensure at least 3 chars
-    const mobilePart = mobile.trim().slice(-4).padStart(4, '0'); // Ensure last 4 digits
+    const namePart = name.trim().toLowerCase().substring(0, 3).padEnd(3, 'x');
+    const mobilePart = mobile.trim().slice(-4).padStart(4, '0');
     let loginId = namePart + mobilePart;
 
-    // Ensure loginId is unique
     let counter = 0;
     let originalLoginId = loginId;
     let userExists = users.find(u => u.loginId === loginId);
@@ -260,14 +388,12 @@ app.post('/api/admin/add-user', async (req, res) => {
       userExists = users.find(u => u.loginId === loginId);
     }
 
-    // Hash the mobile number to use as password
     const hashedPassword = await bcrypt.hash(mobile, 10);
 
-    // Create new user
     const newUser = {
       loginId,
       password: hashedPassword,
-      role: 'official', // These users are for the official login portal
+      role: 'official',
       name,
       dob: new Date(dob),
       fatherName,
@@ -281,7 +407,7 @@ app.post('/api/admin/add-user', async (req, res) => {
       message: 'User created successfully',
       data: {
         loginId: newUser.loginId,
-        password: mobile // Return the plain mobile number as password for the admin to share
+        password: mobile
       }
     });
   } catch (err) {
@@ -408,8 +534,6 @@ app.get('/api/anomalies/:id', (req, res) => {
 
 // Document Upload (mock)
 app.post('/api/documents/upload', (req, res) => {
-  // In a real app, this would handle file upload and storage
-  // For prototype, we just return a mock success
   res.json({
     success: true,
     message: 'File uploaded successfully',
@@ -424,7 +548,6 @@ app.post('/api/documents/upload', (req, res) => {
 
 // Document Analysis (mock)
 app.post('/api/documents/analyze', (req, res) => {
-  // Simulate processing delay
   setTimeout(() => {
     res.json({
       success: true,
@@ -435,7 +558,7 @@ app.post('/api/documents/analyze', (req, res) => {
         notes: 'This is a prototype response. No actual AI analysis was performed.'
       }
     });
-  }, 1500); // Simulate 1.5 seconds processing
+  }, 1500);
 });
 
 // Update Anomaly Status
@@ -446,7 +569,6 @@ app.patch('/api/anomalies/:id/status', (req, res) => {
     return res.status(404).json({ success: false, message: 'Anomaly not found' });
   }
 
-  // Update the anomaly status
   mockData.anomaliesList[anomalyIndex].status = status;
 
   res.json({
