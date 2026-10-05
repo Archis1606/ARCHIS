@@ -16,7 +16,8 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://archis-production.up.railway.app';
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loginId, password }),
@@ -52,7 +53,7 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-md p-8 md:p-10 rounded-3xl bg-zinc-900/40 border border-white/10 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         <div className="flex flex-col items-center mb-8">
           <img 
-            src="\dist\images\logo.png" 
+            src="/dist/images/logo.png" 
             alt="ARCHIS Logo" 
             className="h-16 w-auto object-contain mb-4 filter drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]" 
           />
