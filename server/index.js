@@ -18,6 +18,25 @@ if (!JWT_SECRET) {
   process.exit(1);
 }
 
+// Request Logger & Trailing Slash Cleaner Middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  // Normalize double slashes or trailing slashes for clean routing
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    req.url = req.url.replace(/\/+$/, '') + (req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '');
+  }
+  next();
+});
+
+// Root & Health Check routes for Railway deployment verification
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'ARCHIS Backend API is running successfully.' });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // MOCK DATA FOR USERS (in-memory array)
 let users = [];
 
