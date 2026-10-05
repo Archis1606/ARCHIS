@@ -16,7 +16,7 @@ export default function Login() {
     setError('');
 
     try {
-      const API_URL = (import.meta.env.VITE_API_URL || 'https://archis-production.up.railway.app').replace(/\/$/, '');
+      const API_URL = (import.meta.env.VITE_API_URL || 'https://archis-production-5f10.up.railway.app').replace(/\/$/, '');
       const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
