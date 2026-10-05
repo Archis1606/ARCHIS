@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, MapPin, Scale, AlertCircle, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, Scale, AlertTriangle } from 'lucide-react';
 import { getSafeValue, formatArea, formatCurrency, formatPercentage } from '../../utils/formatters';
 
 export default function LandParcelInformation({ parcel, measuredArea, setMeasuredArea }) {
@@ -96,7 +96,7 @@ export default function LandParcelInformation({ parcel, measuredArea, setMeasure
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <span className="text-[11px] text-zinc-500 uppercase tracking-wider block mb-1">Parcel Status</span>
-            <p className="font-normal text-white">{getSafeValue(landDetails.landClassification)}</p>
+            <p className="font-normal text-white">{getSafeValue(landDetails.parcelStatus || landDetails.landClassification)}</p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <span className="text-[11px] text-zinc-500 uppercase tracking-wider block mb-1">Market Value</span>
@@ -174,5 +174,3 @@ export default function LandParcelInformation({ parcel, measuredArea, setMeasure
     </section>
   );
 }
-
-export default LandParcelInformation;

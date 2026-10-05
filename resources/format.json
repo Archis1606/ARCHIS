@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "standard_version": "1.0",
+    "timestamp_utc": "2026-10-03T03:13:00Z",
+    "overall_record_health": "WARNING_FLAGS_DETECTED"
+  },
+  "identification": {
+    "ulpin_bhu_aadhaar": "14-MH-40012-8921-X",
+    "survey_number": "104",
+    "sub_division_hissa": "2B",
+    "administrative_units": {
+      "state": "Maharashtra",
+      "district": "Pune",
+      "tehsil_taluk": "Haveli",
+      "revenue_circle": "Wagholi",
+      "village_mouza": "Wagholi"
+    }
+  },
+  "spatial_and_gis": {
+    "total_area_sqm": 1500.0,
+    "boundary_type": "Polygon",
+    "coordinates_geojson": {
+      "type": "Polygon",
+      "coordinates": [[[73.9812, 18.5811], [73.9825, 18.5811], [73.9825, 18.5822], [73.9812, 18.5822], [73.9812, 18.5811]]]
+    },
+    "adjacent_plots": {
+      "north": "Survey 103",
+      "south": "Public Road (12m)",
+      "east": "Survey 105/1",
+      "west": "Survey 104/1"
+    },
+    "cadastral_map_url": "https://your-platform.org/storage/cadastral/MH_PUN_HAV_104_2B.pdf"
+  },
+  "title_and_ownership": {
+    "document_type": "7/12 Extract (Record of Rights)",
+    "land_tenure_class": "Occupant Class 1 (Freehold)",
+    "owners": [
+      {
+        "owner_id": "OWN-01",
+        "name": "Ramesh Kumar Sharma",
+        "share_percentage": 100.0,
+        "aadhaar_verified": true
+      }
+    ],
+    "history_chain": [
+      {
+        "year": 2018,
+        "mutation_number": "M-4891",
+        "transaction_type": "Sale Deed",
+        "from_party": "Suresh Patel",
+        "to_party": "Ramesh Kumar Sharma"
+      }
+    ]
+  },
+  "zoning_and_compliance": {
+    "master_plan_zone": "Residential (Yellow Zone)",
+    "current_land_use": "Agricultural",
+    "na_conversion_status": {
+      "is_na_approved": false,
+      "order_number": null
+    },
+    "environmental_restrictions": {
+      "is_eco_sensitive_zone": false,
+      "flood_risk_level": "Low"
+    }
+  },
+  "financial_and_encumbrances": {
+    "circle_rate_per_sqm_inr": 5200,
+    "active_bank_charges": [
+      {
+        "bank_name": "State Bank of India",
+        "loan_amount_inr": 2500000,
+        "encumbrance_certificate_number": "EC-2022-8910"
+      }
+    ],
+    "property_tax_due_inr": 0.0
+  },
+  "litigation_and_disputes": {
+    "rcms_revenue_court_cases": [],
+    "civil_court_cases": [
+      {
+        "case_number": "OS/245/2024",
+        "court_name": "Civil Court Junior Division Haveli",
+        "status": "Pending",
+        "nature_of_dispute": "Boundary / Partition Injunction"
+      }
+    ]
+  },
+  "ai_anomaly_flags": [
+    {
+      "severity": "HIGH",
+      "category": "LITIGATION_RISK",
+      "issue": "Pending civil court stay (OS/245/2024) detected in e-Courts database for owner Ramesh Kumar Sharma.",
+      "action_required": "Verify stay order before processing mutation or title transfer."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "AREA_DISCREPANCY",
+      "issue": "Textual 7/12 area (1500 sqm) differs from Cadastral GIS Polygon area (1462 sqm) by 2.53%.",
+      "action_required": "Trigger ground resurvey using ETS / DGPS."
+    }
+  ]
+}

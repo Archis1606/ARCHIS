@@ -9,7 +9,7 @@ import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import LandParcelDetailsPage from './components/LandParcelDetails/LandParcelDetailsPage';
+import LandRecordDetailPage from './components/LandRecordDetailPage';
 import { useScrollReveal } from './hooks/useScrollReveal';
 
 function App() {
@@ -17,11 +17,12 @@ function App() {
 
   return (
     <Router>
-      <div className="relative min-h-screen bg-[#0a0a0a] text-white">
-        <Navbar />
+      <div className="relative min-h-screen bg-[#0a0a0a] text-white glass-effect-dark">
+        {/* Only show Navbar on landing page (home route) */}
         <Routes>
           <Route path="/" element={
             <>
+              <Navbar />
               <Hero />
               <IntroSection />
               <ProcessSection />
@@ -32,7 +33,7 @@ function App() {
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/land/:landPin" element={<LandParcelDetailsPage />} />
+          <Route path="/land/:ulpin" element={<LandRecordDetailPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

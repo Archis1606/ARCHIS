@@ -355,13 +355,201 @@ app.get('/api/land-records/search', (req, res) => {
   res.json({ success: true, data: results });
 });
 
+// Helper function to transform flat record to nested format.json structure
+function transformRecordToFormat(record) {
+  console.log('TRANSFORM FUNCTION CALLED for:', record.ulpin);
+  // Parse area from recordedArea string (e.g., "4.82 Acres")
+  const areaMatch = record.recordedArea.match(/([\d.]+)\s*Acres?/i);
+  const areaAcres = areaMatch ? parseFloat(areaMatch[1]) : 0;
+  const areaSqm = areaAcres * 4046.86;
+
+  // Parse GIS area
+  const gisAreaMatch = record.gisSpatialArea.match(/([\d.]+)\s*Acres?/i);
+  const gisAreaAcres = gisAreaMatch ? parseFloat(gisAreaMatch[1]) : areaAcres;
+  const gisAreaSqm = gisAreaAcres * 4046.86;
+
+  // Determine state/district/tehsil/village for admin units
+  const state = record.state;
+  const district = record.district;
+  const tehsil_taluk = record.tehsil;
+  const village_mouza = record.village;
+  const revenue_circle = `${district} Revenue Circle`;
+
+  // Parse coordinates
+  let coordinates_geojson = {
+    type: "Polygon",
+    coordinates: [[[73.9812, 18.5811], [73.9825, 18.5811], [73.9825, 18.5822], [73.9812, 18.5822], [73.9812, 18.5811]]]
+  };
+  if (record.coordinates) {
+    const coordMatch = record.coordinates.match(/([\d.]+)°\s*[NS],\s*([\d.]+)°\s*[EW]/);
+    if (coordMatch) {
+      const lat = parseFloat(coordMatch[1]);
+      const lon = parseFloat(coordMatch[2]);
+      const offset = 0.001;
+      coordinates_geojson = {
+        type: "Polygon",
+        coordinates: [[[lon - offset, lat - offset], [lon + offset, lat - offset], [lon + offset, lat + offset], [lon - offset, lat + offset], [lon - offset, lat - offset]]]
+      };
+    }
+  }
+
+  // Determine document type and land tenure based on record
+  const documentType = '7/12 Extract (Record of Rights)';
+  const landTenureClass = 'Occupant Class 1 (Freehold)';
+
+  // Create owner from ownerName
+  const ownerName = record.ownerName;
+  const fatherName = record.fatherName || 'N/A';
+
+  // Create history chain from mutation info
+  const historyChain = record.lastMutationDate ? [{
+    year: new Date(record.lastMutationDate).getFullYear(),
+    mutation_number: `M-${record.ulpin.slice(-6)}`,
+    transaction_type: 'Sale Deed',
+    from_party: fatherName,
+    to_party: ownerName
+  }] : [];
+
+  // Parse circle rate from market value estimate
+  const marketValueMatch = record.marketValueEstimate.match(/₹\s*([\d,]+)/);
+  const marketValue = marketValueMatch ? parseInt(marketValueMatch[1].replace(/,/g, '')) : 0;
+  const circleRatePerSqm = areaSqm > 0 ? Math.round(marketValue / areaSqm) : 5000;
+
+  // Determine zoning
+  const landType = record.landType.toLowerCase();
+  let masterPlanZone = 'Residential (Yellow Zone)';
+  let currentLandUse = 'Agricultural';
+  if (landType.includes('commercial')) {
+    masterPlanZone = 'Commercial (Red Zone)';
+    currentLandUse = 'Commercial';
+  } else if (landType.includes('residential')) {
+    masterPlanZone = 'Residential (Yellow Zone)';
+    currentLandUse = 'Residential';
+  } else if (landType.includes('agricultural')) {
+    masterPlanZone = 'Agricultural (Green Zone)';
+    currentLandUse = 'Agricultural';
+  }
+
+  // Determine NA conversion status
+  const isNAApproved = !landType.includes('agricultural') && !currentLandUse.includes('Agricultural');
+
+  // Parse encumbrance status
+  const hasEncumbrance = record.encumbranceStatus && record.encumbranceStatus.toLowerCase().includes('bank');
+  const bankCharges = hasEncumbrance ? [{
+    bank_name: record.encumbranceStatus.replace('Bank Lien (', '').replace(')', ''),
+    loan_amount_inr: Math.round(marketValue * 0.3),
+    encumbrance_certificate_number: `EC-${record.ulpin.slice(-8)}`
+  }] : [];
+
+  // Parse anomaly flags
+  const anomalyFlags = [];
+  if (record.anomalyStatus && record.anomalyStatus.toLowerCase().includes('area')) {
+    anomalyFlags.push({
+      severity: 'HIGH',
+      category: 'AREA_DISCREPANCY',
+      issue: `Textual area (${record.recordedArea}) differs from GIS area (${record.gisSpatialArea})`,
+      action_required: 'Trigger ground resurvey using ETS / DGPS'
+    });
+  }
+  if (record.anomalyStatus && record.anomalyStatus.toLowerCase().includes('boundary')) {
+    anomalyFlags.push({
+      severity: 'MEDIUM',
+      category: 'BOUNDARY_MISMATCH',
+      issue: record.anomalyStatus,
+      action_required: 'Verify boundary markers and update cadastral map'
+    });
+  }
+  if (hasEncumbrance) {
+    anomalyFlags.push({
+      severity: 'MEDIUM',
+      category: 'ENCUMBRANCE_DETECTED',
+      issue: `Active bank charge: ${record.encumbranceStatus}`,
+      action_required: 'Verify loan status before any transfer'
+    });
+  }
+
+  // Determine overall health
+  let overallHealth = 'VERIFIED_CLEAN';
+  if (anomalyFlags.some(f => f.severity === 'HIGH')) overallHealth = 'WARNING_FLAGS_DETECTED';
+  else if (anomalyFlags.length > 0) overallHealth = 'MINOR_FLAGS_DETECTED';
+
+  const result = {
+    meta: {
+      standard_version: 'TEST-VERSION',
+      timestamp_utc: new Date().toISOString(),
+      overall_record_health: overallHealth
+    },
+    identification: {
+      ulpin_bhu_aadhaar: record.ulpin,
+      survey_number: record.khasraNo || record.parcelId,
+      sub_division_hissa: '1',
+      administrative_units: {
+        state,
+        district,
+        tehsil_taluk,
+        revenue_circle,
+        village_mouza
+      }
+    },
+    spatial_and_gis: {
+      total_area_sqm: Math.round(areaSqm),
+      boundary_type: 'Polygon',
+      coordinates_geojson,
+      adjacent_plots: {
+        north: 'Survey ' + (parseInt(record.khasraNo?.split('//')[0] || '100') - 1),
+        south: 'Public Road',
+        east: 'Survey ' + (parseInt(record.khasraNo?.split('//')[0] || '100') + 1),
+        west: 'Survey ' + record.khasraNo?.split('//')[0] || '100' + '/1'
+      },
+      cadastral_map_url: `https://cadastral.example.com/${state}_${district}_${record.khasraNo?.replace(/\//g, '_') || record.ulpin}.pdf`
+    },
+    title_and_ownership: {
+      document_type: documentType,
+      land_tenure_class: landTenureClass,
+      owners: [{
+        owner_id: `OWN-${record.ulpin.slice(-4)}`,
+        name: ownerName,
+        share_percentage: 100.0,
+        aadhaar_verified: true
+      }],
+      history_chain: historyChain
+    },
+    zoning_and_compliance: {
+      master_plan_zone: masterPlanZone,
+      current_land_use: currentLandUse,
+      na_conversion_status: {
+        is_na_approved: isNAApproved,
+        order_number: isNAApproved ? `NA-${record.ulpin.slice(-6)}` : null
+      },
+      environmental_restrictions: {
+        is_eco_sensitive_zone: false,
+        flood_risk_level: 'Low'
+      }
+    },
+    financial_and_encumbrances: {
+      circle_rate_per_sqm_inr: circleRatePerSqm,
+      active_bank_charges: bankCharges,
+      property_tax_due_inr: Math.round(circleRatePerSqm * areaSqm * 0.001)
+    },
+    litigation_and_disputes: {
+      rcms_revenue_court_cases: [],
+      civil_court_cases: []
+    },
+    ai_anomaly_flags: anomalyFlags
+  };
+
+  console.log('TRANSFORM RESULT for', record.ulpin, 'keys:', Object.keys(result));
+  return result;
+}
+
 // Get Single Land Record by ULPIN
 app.get('/api/land-records/:ulpin', (req, res) => {
   const record = mockData.landRecords.find(r => r.ulpin.toLowerCase() === req.params.ulpin.toLowerCase());
   if (!record) {
     return res.status(404).json({ success: false, message: 'Land record not found for the given ULPIN' });
   }
-  res.json({ success: true, data: record });
+  const formattedRecord = transformRecordToFormat(record);
+  res.json({ success: true, data: formattedRecord });
 });
 
 // Admin route to add a new user

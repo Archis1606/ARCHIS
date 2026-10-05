@@ -3,8 +3,8 @@ import { ShieldCheck, ArrowLeft, Lock, User, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [loginId, setLoginId] = useState('');
-  const [password, setPassword] = useState('');
+  const [loginId, setLoginId] = useState('admin');
+  const [password, setPassword] = useState('admin123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -16,7 +16,6 @@ export default function Login() {
     setError('');
 
     try {
-      // API_ENDPOINT would be http://localhost:5000/api/login
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,7 +43,7 @@ export default function Login() {
 
       <button
         onClick={() => navigate('/')}
-        className="absolute top-8 left-8 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-normal z-20"
+        className="absolute top-8 left-8 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-normal z-20 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Home
@@ -52,9 +51,11 @@ export default function Login() {
 
       <div className="relative z-10 w-full max-w-md p-8 md:p-10 rounded-3xl bg-zinc-900/40 border border-white/10 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-            <img src="/map.svg" alt="ARCHIS Logo" className="w-10 h-10 object-contain filter invert opacity-90" />
-          </div>
+          <img 
+            src="\dist\images\logo.png" 
+            alt="ARCHIS Logo" 
+            className="h-16 w-auto object-contain mb-4 filter drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]" 
+          />
           <h1 className="text-2xl font-normal tracking-wide text-white">Official Portal</h1>
           <p className="text-xs text-zinc-400 mt-1">ARCHIS Spatial Intelligence System</p>
         </div>
@@ -71,7 +72,7 @@ export default function Login() {
                 localStorage.removeItem('archis_token');
                 navigate('/');
               }}
-              className="mt-4 px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-normal text-white transition-colors hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+              className="mt-4 px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-normal text-white transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               Sign Out
             </button>
@@ -121,7 +122,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full py-3.5 rounded-xl bg-emerald-500 text-black font-normal text-sm hover:bg-emerald-400 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+              className="mt-2 w-full py-3.5 rounded-xl bg-emerald-500 text-black font-normal text-sm hover:bg-emerald-400 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               {loading ? (
                 <>

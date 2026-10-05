@@ -2,28 +2,28 @@ import React from 'react';
 import { Shield, AlertTriangle, CheckCircle2, XCircle, AlertCircle, Target, TrendingUp, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { getSafeValue, formatArea, formatPercentage, formatDate, formatCurrency } from '../../utils/formatters';
 
+const getStatusConfig = (status) => {
+  switch (status) {
+    case 'Verified':
+      return { icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/30', label: '✓ Verified' };
+    case 'Needs Review':
+      return { icon: AlertTriangle, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30', label: '⚠ Needs Review' };
+    case 'Minor Discrepancy':
+      return { icon: AlertCircle, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/30', label: '⚠ Minor Discrepancy' };
+    case 'Conflict Detected':
+      return { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/30', label: '✕ Conflict Detected' };
+    case 'Under Review':
+      return { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30', label: '⚠ Under Review' };
+    default:
+      return { icon: AlertTriangle, color: 'text-zinc-400', bg: 'bg-zinc-500/20', border: 'border-zinc-500/30', label: 'Unknown' };
+  }
+};
+
 export default function ArchesAnalysis({ parcel }) {
-  const analysis = parcel.analysis || {};
-  const landDetails = parcel.landDetails || {};
-
-  const getStatusConfig = (status) => {
-    switch (status) {
-      case 'Verified':
-        return { icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/30', label: '✓ Verified' };
-      case 'Needs Review':
-        return { icon: AlertTriangle, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30', label: '⚠ Needs Review' };
-      case 'Minor Discrepancy':
-        return { icon: AlertCircle, color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/30', label: '⚠ Minor Discrepancy' };
-      case 'Conflict Detected':
-        return { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/30', label: '✕ Conflict Detected' };
-      case 'Under Review':
-        return { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30', label: '⚠ Under Review' };
-      default:
-        return { icon: AlertTriangle, color: 'text-zinc-400', bg: 'bg-zinc-500/20', border: 'border-zinc-500/30', label: 'Unknown' };
-    }
-  };
-
+  const analysis = parcel?.analysis || {};
+  const landDetails = parcel?.landDetails || {};
   const statusConfig = getStatusConfig(analysis.status);
+  const StatusIcon = statusConfig.icon;
 
   return (
     <section className="rounded-2xl bg-zinc-900/40 border border-white/10 p-6 backdrop-blur-xl">
@@ -45,7 +45,7 @@ export default function ArchesAnalysis({ parcel }) {
           inline-flex items-center gap-3 px-4 py-3 rounded-xl border
           ${statusConfig.bg} ${statusConfig.border} ${statusConfig.color}
         `}>
-          <statusConfig.icon className={`w-5 h-5 ${statusConfig.color}`} />
+          <StatusIcon className={`w-5 h-5 ${statusConfig.color}`} />
           <span className="text-sm font-medium">{statusConfig.label}</span>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function ArchesAnalysis({ parcel }) {
         <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
           <span className="text-[11px] text-zinc-500 uppercase tracking-wider block mb-1">Analysis Status</span>
           <div className="flex items-center gap-2">
-            <statusConfig.icon className={`w-5 h-5 ${statusConfig.color}`} />
+            <StatusIcon className={`w-5 h-5 ${statusConfig.color}`} />
             <span className={`font-normal ${statusConfig.color}`}>{statusConfig.label}</span>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function ArchesAnalysis({ parcel }) {
                 <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <span>{issue}</span>
               </li>
-            )}
+            ))}
           </ul>
         </div>
       )}
@@ -165,5 +165,3 @@ export default function ArchesAnalysis({ parcel }) {
     </section>
   );
 }
-
-export default ArchesAnalysis;

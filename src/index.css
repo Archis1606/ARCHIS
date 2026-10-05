@@ -51,6 +51,24 @@ body {
   }
 }
 
+/* Glassmorphism effects */
+.glass-effect {
+  @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+}
+
+.glass-effect-dark {
+  @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+}
+
+/* Enhanced glass effect for cards and panels */
+.glass-card {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.2)];
+}
+
+.glass-panel {
+  @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+}
+
 /* Scroll reveal animation classes */
 .reveal {
   opacity: 0;
@@ -79,4 +97,13 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #333;
+}
+
+/* Glass button styles */
+.glass-btn {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all duration-300;
+}
+
+.glass-btn-dark {
+  @apply bg-black/30 backdrop-blur-lg border border-white/10 hover:bg-black/40 transition-all duration-300;
 }

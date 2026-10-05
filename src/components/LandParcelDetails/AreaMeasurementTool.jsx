@@ -1,33 +1,18 @@
 import React, { useState } from 'react';
-import { Scale, Minus, Plus, Maximize2, Minimize2, Trash2, CheckCircle2, XCircle, History } from 'lucide-react';
-import { getSafeValue, formatArea, formatCurrency, formatDateTime } from '../../utils/formatters';
+import { Scale, XCircle, History, Trash2 } from 'lucide-react';
+import { formatArea, formatDateTime } from '../../utils/formatters';
 
 export default function AreaMeasurementTool({ parcel, measuredArea, setMeasuredArea }) {
   const landDetails = parcel.landDetails || {};
   const recordedArea = landDetails.recordedArea;
-  const gisArea = landDetails.gisSpatialArea;
   const areaUnit = landDetails.areaUnit || 'Acres';
 
   const [measurements, setMeasurements] = useState([]);
   const [activeTool, setActiveTool] = useState(null);
   const [measurementHistory, setMeasurementHistory] = useState([]);
 
-  const addMeasurement = (value) => {
-    setMeasurements(prev => [...prev, value]);
-  };
-
   const clearMeasurements = () => {
     setMeasurements([]);
-  };
-
-  const recordMeasurement = (type, value) => {
-    const record = {
-      type,
-      value,
-      unit: parcel.landDetails?.areaUnit || 'Acres',
-      timestamp: new Date().toISOString()
-    };
-    setMeasurementHistory(prev => [record, ...prev].slice(0, 10));
   };
 
   return (
@@ -253,5 +238,3 @@ export default function AreaMeasurementTool({ parcel, measuredArea, setMeasuredA
     </section>
   );
 }
-
-export default AreaMeasurementTool;

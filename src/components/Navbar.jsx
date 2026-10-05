@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, UserCheck, ShieldCheck } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+
+  // Hide navbar on login and dashboard pages
+  const shouldHideNavbar = location.pathname === '/login' || location.pathname === '/dashboard';
+  // Show buttons only on landing page
+  const showButtons = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,7 +27,6 @@ export default function Navbar() {
   const scrollToSection = (id) => {
     setIsOpen(false);
     if (id === 'about' || id === 'how-it-works' || id === 'technology') {
-      // These are sections on the same page
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
@@ -33,6 +39,10 @@ export default function Navbar() {
     window.location.href = '/login';
   };
 
+  if (shouldHideNavbar) {
+    return null;
+  }
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
@@ -43,10 +53,12 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Brand / Logo */}
-        <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-white/5 border border-white/10 group-hover:border-emerald-500/50 transition-colors duration-300">
-            <img src="/map.svg" alt="ARCHIS Logo" className="w-6 h-6 object-contain filter invert opacity-80 group-hover:opacity-100 transition-all duration-300" />
-          </div>
+        <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }} className="flex items-center gap-3 group cursor-pointer">
+          <img 
+            src="\dist\images\circle-logo.png" 
+            alt="ARCHIS Logo" 
+            className="w-12 h-12 rounded-full object-cover border border-white/10 group-hover:border-emerald-500/50 transition-colors duration-300 shadow-[0_0_15px_rgba(16,185,129,0.15)]" 
+          />
           <span className="font-semibold text-xl tracking-wider text-white group-hover:text-emerald-400 transition-colors duration-300">
             ARCHIS
           </span>
@@ -71,29 +83,31 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Citizen Portal & Official Login Buttons */}
-        <div className="hidden md:flex items-center gap-3">
-          <button
-            onClick={() => scrollToSection('about')}
-            className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-xs font-normal transition-all duration-300 flex items-center gap-1.5 active:scale-95"
-          >
-            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-            Citizen Portal
-          </button>
-          <button
-            onClick={handleLoginClick}
-            className="px-4 py-2 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-normal transition-all duration-300 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center gap-1.5 active:scale-95"
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Official Login
-          </button>
-        </div>
+        {/* Citizen Portal & Official Login Buttons (Desktop) */}
+        {showButtons && (
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => scrollToSection('about')}
+              className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-xs font-normal transition-all duration-300 flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+              Citizen Portal
+            </button>
+            <button
+              onClick={handleLoginClick}
+              className="px-4 py-2 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-normal transition-all duration-300 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Official Login
+            </button>
+          </div>
+        )}
 
         {/* Mobile menu button */}
         <div className="md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-lg text-zinc-400 hover:text-white focus:outline-none transition-colors duration-200"
+            className="p-2 rounded-lg text-zinc-400 hover:text-white focus:outline-none transition-colors duration-200 cursor-pointer"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -123,22 +137,24 @@ export default function Navbar() {
               {item.label}
             </a>
           ))}
-          <div className="pt-2 flex flex-col gap-3">
-            <button
-              onClick={() => scrollToSection('about')}
-              className="w-full py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-sm font-normal text-center flex items-center justify-center gap-2"
-            >
-              <UserCheck className="w-4 h-4 text-emerald-400" />
-              Citizen Portal
-            </button>
-            <button
-              onClick={handleLoginClick}
-              className="w-full py-2.5 rounded-full bg-emerald-500 text-black font-medium text-center text-sm hover:bg-emerald-400 transition-colors duration-200 flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              Official Login
-            </button>
-          </div>
+          {showButtons && (
+            <div className="pt-2 flex flex-col gap-3">
+              <button
+                onClick={() => scrollToSection('about')}
+                className="w-full py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-sm font-normal text-center flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <UserCheck className="w-4 h-4 text-emerald-400" />
+                Citizen Portal
+              </button>
+              <button
+                onClick={handleLoginClick}
+                className="w-full py-2.5 rounded-full bg-emerald-500 text-black font-medium text-center text-sm hover:bg-emerald-400 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Official Login
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

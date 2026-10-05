@@ -8,9 +8,9 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
   const [mapError, setMapError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const latitude = parcel.location?.latitude;
-  const longitude = parcel.location?.longitude;
-  const boundaryCoordinates = parcel.location?.boundaryCoordinates;
+  const latitude = parcel?.location?.latitude;
+  const longitude = parcel?.location?.longitude;
+  const boundaryCoordinates = parcel?.location?.boundaryCoordinates;
 
   useEffect(() => {
     const initMap = async () => {
@@ -70,7 +70,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
   }
 
   return (
-    <div className="h-[600px] lg:h-[700px] rounded-2xl bg-zinc-900/40 border border-white/10 backdrop-blur-xl relative overflow-hidden">
+    <div className={`rounded-2xl bg-zinc-900/40 border border-white/10 backdrop-blur-xl relative overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50 h-screen w-screen rounded-none' : 'h-[600px] lg:h-[700px]'}`}>
       {/* Header */}
       <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
 
           {/* Boundary coordinates display */}
           {boundaryCoordinates && boundaryCoordinates.length > 0 && (
-            <div className="absolute bottom-4 left-4 right-4 max-w-md mx-auto bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
+            <div className="absolute bottom-4 left-4 right-4 max-w-md mx-auto bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10 hidden sm:block">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">Parcel Boundary</span>
                 <span className="text-[10px] text-zinc-400">{boundaryCoordinates.length} vertices</span>
@@ -157,7 +157,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
           )}
 
           {/* Center coordinates display */}
-          <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
+          <div className="absolute top-20 left-4 sm:top-4 bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
             <div className="flex items-center gap-2 text-xs">
               <MapPin className="w-3 h-3 text-emerald-400" />
               <span className="text-zinc-400">Center:</span>
@@ -167,24 +167,24 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
         </div>
 
         {/* Map Controls */}
-        <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
+        <div className="absolute bottom-20 sm:bottom-4 right-4 flex flex-col gap-2 z-10">
           <button
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
             aria-label="Zoom in"
           >
-            <ZoomIn className="w-4 h-5" />
+            <ZoomIn className="w-4 h-4" />
           </button>
           <button
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
             aria-label="Zoom out"
           >
-            <ZoomOut className="w-4 h-5" />
+            <ZoomOut className="w-4 h-4" />
           </button>
           <button
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
             aria-label="Reset view"
           >
-            <RotateCcw className="w-4 h-5" />
+            <RotateCcw className="w-4 h-4" />
           </button>
           <button
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
@@ -196,7 +196,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
         </div>
 
         {/* Layer Controls */}
-        <div className="absolute bottom-4 left-4 z-10">
+        <div className="absolute bottom-4 left-4 z-10 hidden md:block">
           <div className="bg-black/80 backdrop-blur-xl rounded-xl p-3 border border-white/10">
             <div className="flex items-center gap-2 mb-2">
               <Layers className="w-4 h-4 text-emerald-400" />
@@ -224,7 +224,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
         </div>
 
         {/* Parcel Info Card */}
-        <div className="absolute top-4 right-4 w-56 bg-black/80 backdrop-blur-xl rounded-xl p-4 border border-white/10">
+        <div className="absolute top-20 right-4 sm:top-4 w-56 bg-black/80 backdrop-blur-xl rounded-xl p-4 border border-white/10 hidden sm:block">
           <div className="flex items-center gap-2 mb-3">
             <MapPin className="w-4 h-4 text-emerald-400" />
             <span className="text-sm font-medium text-emerald-400">Parcel Location</span>
@@ -244,28 +244,7 @@ export default function GeospatialView({ parcel, measuredArea, setMeasuredArea }
             </div>
           </div>
         </div>
-
-        {/* Fullscreen overlay */}
-        {isFullscreen && (
-          <div className="absolute inset-0 z-50 fixed bg-black/95 backdrop-blur-sm">
-            <div className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors" onClick={() => setIsFullscreen(false)}>
-              <Minimize2 className="w-6 h-6" />
-            </div>
-            <div className="absolute top-4 left-4 p-2">
-              <button className="p-2 rounded-xl bg-white/10 hover:bg-white/10 text-white transition-colors" onClick={() => setIsFullscreen(false)}>
-                <Minimize2 className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="h-full w-full flex items-center justify-center">
-              <div className="w-full h-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden">
-                <GeospatialView parcel={parcel} measuredArea={measuredArea} setMeasuredArea={setMeasuredArea} />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 }
-
-export default GeospatialView;

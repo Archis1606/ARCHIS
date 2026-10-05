@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, AlertTriangle, CheckCircle2, XCircle, AlertCircle, ChevronLeft } from 'lucide-react';
+import { MapPin, AlertTriangle, CheckCircle2, XCircle, AlertCircle, ChevronLeft } from 'lucide-react';
 
 export default function Header({ parcel, onBack, activeTab, setActiveTab, tabs }) {
   const getStatusConfig = (status) => {
@@ -103,5 +103,3 @@ export default function Header({ parcel, onBack, activeTab, setActiveTab, tabs }
     </header>
   );
 }
-
-export default Header;

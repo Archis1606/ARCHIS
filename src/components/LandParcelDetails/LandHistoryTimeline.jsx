@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, History, ArrowUp, ArrowDown, User, FileText, MapPin, Gavel, Shield, AlertTriangle, CheckCircle2, XCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, History, ArrowUp, ArrowDown, ArrowRight, User, FileText, MapPin, Gavel, Shield, AlertTriangle, CheckCircle2, XCircle, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatDate } from '../../utils/formatters';
 
 const getEventTypeIcon = (type) => {
@@ -84,13 +84,13 @@ export default function LandHistoryTimeline({ parcel }) {
           {/* Timeline line */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-white/10" />
 
-          {history.map((event, index) => (
+          {sortedHistory.map((event, index) => (
             <div key={index} className="relative pl-20 pb-8 last:pb-0">
               {/* Timeline dot and connector */}
               <div className="absolute left-4 top-1 w-8 h-8 flex items-center justify-center">
                 <div className="relative">
                   {/* Connector line */}
-                  {index < history.length - 1 && (
+                  {index < sortedHistory.length - 1 && (
                     <div className="absolute left-3 top-10 bottom-0 w-0.5 bg-white/10" />
                   )}
                   {/* Dot */}
@@ -110,7 +110,7 @@ export default function LandHistoryTimeline({ parcel }) {
                     style={{
                       background: `var(--event-bg)`,
                       border: '1px solid var(--event-border)'
-                    } as React.CSSProperties}>
+                    }}>
                     {getEventTypeIcon(event.type)}
                   </div>
 
@@ -140,7 +140,7 @@ export default function LandHistoryTimeline({ parcel }) {
             </div>
           ))}
         </div>
-      )} : (
+      ) : (
         <div className="rounded-xl bg-white/[0.02] border border-white/5 p-8 text-center">
           <History className="w-12 h-12 text-zinc-500 mx-auto mb-3" />
           <h3 className="text-lg font-normal text-zinc-400 mb-2">No History Records</h3>
@@ -150,5 +150,3 @@ export default function LandHistoryTimeline({ parcel }) {
     </section>
   );
 }
-
-export default LandHistoryTimeline;

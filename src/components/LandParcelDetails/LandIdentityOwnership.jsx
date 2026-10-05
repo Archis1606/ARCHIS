@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, MapPin, Building, Scale, AlertCircle, CheckCircle2, Shield, FileText } from 'lucide-react';
+import { User, MapPin, Building, Scale, FileText } from 'lucide-react';
 import { getSafeValue } from '../../utils/formatters';
 
 export default function LandIdentityOwnership({ parcel }) {
@@ -9,10 +9,10 @@ export default function LandIdentityOwnership({ parcel }) {
   const fields = [
     { label: 'Land PIN / Parcel ID', value: parcel.landPin, icon: <MapPin className="w-4 h-4" /> },
     { label: 'Owner Name', value: getSafeValue(ownership.ownerName), icon: <User className="w-4 h-4" /> },
-    { label: 'Father\'s Name', value: getSafeValue(ownership.fatherName), icon: <User className="w-4 h-4" /> },
+    { label: "Father's Name", value: getSafeValue(ownership.fatherName), icon: <User className="w-4 h-4" /> },
     { label: 'Co-owners', value: ownership.coOwners?.length ? ownership.coOwners.join(', ') : 'None', icon: <User className="w-4 h-4" /> },
     { label: 'Ownership Type', value: getSafeValue(ownership.ownershipType), icon: <Scale className="w-4 h-4" /> },
-    { label: 'Ownership Status', value: getSafeValue(ownership.ownershipStatus), icon: <Shield className="w-4 h-4" /> },
+    { label: 'Ownership Status', value: getSafeValue(ownership.ownershipStatus), icon: <Scale className="w-4 h-4" /> },
     { label: 'State', value: getSafeValue(location.state), icon: <Building className="w-4 h-4" /> },
     { label: 'District', value: getSafeValue(location.district), icon: <Building className="w-4 h-4" /> },
     { label: 'Tehsil', value: getSafeValue(location.tehsil), icon: <Building className="w-4 h-4" /> },
@@ -62,5 +62,3 @@ export default function LandIdentityOwnership({ parcel }) {
     </section>
   );
 }
-
-export default LandIdentityOwnership;
